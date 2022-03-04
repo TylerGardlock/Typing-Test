@@ -9,29 +9,38 @@ def start_screen(stdscr):
     stdscr.refresh()
     stdscr.getkey()
 
+def display_text(stdscr, target_text, current_text, wpm=0):
+    stdscr.addstr(target_text)
+    
+    
+    for i, char in enumerate(current_text):
+        correct_char = target_text[i]
+        color = curses.color_pair(1)
+        if char != correct_char:
+            color = curses.color_pair(2)
+            
+        stdscr.addstr(0, i, char, color)
+
+    
 def wpm_test(stdscr):
     target_text = "Hello World. Test Text"
     current_text = []
     
-    stdscr.clear()
-    stdscr.addstr(target_text)
-    stdscr.refresh()
-
     while True:
+        stdscr.clear()
+        display_text(stdscr, target_text, current_text)
+        stdscr.refresh()  
+        
         key = stdscr.getkey()
         
         if ord(key) == 27: # esc key
             break
-        
-        current_text.append(key)
-        
-        stdscr.clear()
-        stdscr.addstr(target_text)
-        
-        for char in current_text:
-            stdscr.addstr(char, curses.color_pair(1))
-            
-        stdscr.refresh()
+        # Using backspace to delete characters typed
+        if key in ("KEY_BACKSPACE", '\b', "\x7f"):
+            if len(current_text) > 0:
+                current_text.pop()
+        else:
+            current_text.append(key)
 
 def main(stdscr):
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
